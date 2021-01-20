@@ -1,0 +1,21 @@
+server:
+  port: 8887
+
+spring:
+  application:
+    name: youxu-shop
+
+dubbo:
+  protocol:
+    # dubbo 协议
+     name: dubbo
+     port: 20891
+  scan:
+    base-packages: cn.youxu
+  metadata-report:
+    address: zookeeper://127.0.0.1:2181
+  application:
+    name: youxu-shop
+  registry:
+    address: zookeeper://127.0.0.1:2181
+    simplified: true
