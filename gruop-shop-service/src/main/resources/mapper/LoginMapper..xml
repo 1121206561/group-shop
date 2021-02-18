@@ -2,8 +2,33 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="cn.youxu.shop.mapper.LoginMapper">
 
-    <select id="getUser" resultType="cn.youxu.shop.entity.UserDTO">
-        SELECT * FROM group_login WHERE username = #{username}
+    <resultMap id="BaseResultMap" type="cn.youxu.shop.entity.UserDTO">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="username" property="username"  jdbcType="VARCHAR"/>
+        <result column="password" property="password"  jdbcType="VARCHAR"/>
+        <result column="user_role" property="userRoleId" jdbcType="INTEGER"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="StaffMap" type="cn.youxu.shop.entity.StaffDTO">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="name" property="name"  jdbcType="VARCHAR"/>
+        <result column="sex" property="sexId"  jdbcType="INTEGER"/>
+        <result column="job_number" property="jobNumber"  jdbcType="INTEGER"/>
+        <result column="user_role" property="userRoleId" jdbcType="INTEGER"/>
+        <result column="avatar" property="avatar" jdbcType="VARCHAR"/>
+        <result column="describe" property="userRole" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+    <select id="getUser" resultMap="BaseResultMap">
+        SELECT id,username,password,user_role,is_deleted FROM group_login WHERE username = #{username}
+    </select>
+
+    <select id="getStaff" resultMap="StaffMap">
+        SELECT gs.id,gs.name,gl.user_role,gs.avatar,d.describe,gs.job_number FROM group_login as gl
+        left join group_staff as gs ON gl.id = gs.login_id
+        left join dictionary as d ON d.colum = 'user_role' AND d.sense = gl.user_role
+        where gl.username = #{username}
     </select>
 
 </mapper>
