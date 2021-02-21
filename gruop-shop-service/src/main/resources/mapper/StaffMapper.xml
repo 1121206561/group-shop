@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.youxu.shop.mapper.StaffMapper">
+
+    <resultMap id="StaffMap" type="cn.youxu.shop.entity.StaffDTO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="sex" property="sexId" jdbcType="INTEGER"/>
+        <result column="sex_des" property="sex" jdbcType="VARCHAR"/>
+        <result column="job_number" property="jobNumber" jdbcType="VARCHAR"/>
+        <result column="avatar" property="avatar" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="user_role" property="userRoleId" jdbcType="INTEGER"/>
+        <result column="user_role_des" property="userRole" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="EmployeeMap" type="cn.youxu.shop.entity.EmployeeDTO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="sex" property="sexId" jdbcType="INTEGER"/>
+        <result column="type" property="typeId" jdbcType="INTEGER"/>
+        <result column="type_des" property="type" jdbcType="VARCHAR"/>
+        <result column="sex_des" property="sex" jdbcType="VARCHAR"/>
+        <result column="job_number" property="jobNumber" jdbcType="VARCHAR"/>
+        <result column="user_role" property="userRoleId" jdbcType="INTEGER"/>
+        <result column="user_role_des" property="userRole" jdbcType="VARCHAR"/>
+        <result column="shop_name" property="shopName" jdbcType="VARCHAR"/>
+        <result column="shop_logo" property="shopLogo" jdbcType="VARCHAR"/>
+        <result column="shop_describe" property="shopDescribe" jdbcType="INTEGER"/>
+        <result column="register_time" property="registerTime" jdbcType="VARCHAR"/>
+        <result column="shop_coordinate" property="shopCoordinate" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <select id="getStaffs" resultMap="StaffMap">
+        SELECT gs.id,gs.name,gs.sex,gs.job_number,gs.avatar,d.describe as sex_des,gs.content,
+        gl.user_role,d2.describe as user_role_des FROM group_staff gs
+        left join dictionary d ON d.colum = 'sex' AND d.sense = gs.sex
+        left join group_login gl ON gl.id = gs.login_id
+        left join dictionary as d2 ON d2.colum = 'user_role' AND d2.sense = gl.user_role
+        <where>
+            <if test="name != null and name != ''">
+                AND gs.name = #{name}
+            </if>
+            <if test="jobNumber != null and jobNumber != ''">
+                AND gs.job_number = #{jobNumber}
+            </if>
+            <if test="userRole != null and userRole != ''">
+                AND gl.user_role = #{userRole}
+            </if>
+        </where>
+    </select>
+
+    <select id="getEmployees" parameterType="cn.youxu.shop.entity.EmployeeVO" resultMap="EmployeeMap">
+        SELECT gs.id,gs.name,gs.sex,gs.job_number,d.describe as sex_des,
+        gc.phone,gc.address,gc.register_time,gc.shop_logo,gc.shop_describe,gc.shop_name,
+        gs.type,gl.user_role,d2.describe as user_role_des,d3.describe as type_des FROM group_chief gc
+        left join group_staff gs ON gs.job_number = gc.job_number
+        left join dictionary d ON d.colum = 'sex' AND d.sense = gs.sex
+        left join group_login gl ON gl.id = gs.login_id
+        left join dictionary as d2 ON d2.colum = 'user_role' AND d2.sense = gl.user_role
+        left join dictionary as d3 ON d3.colum = 'type' AND d3.sense = gs.type
+        <where>
+            <if test="employeeVO != null">
+                <if test="employeeVO.name != null and employeeVO.name != ''">
+                    AND gs.name = #{employeeVO.name}
+                </if>
+                <if test="employeeVO.jobNumber != null and employeeVO.jobNumber != ''">
+                    AND gs.job_number = #{employeeVO.jobNumber}
+                </if>
+                <if test="employeeVO.userRole != null and employeeVO.userRole != ''">
+                    AND gl.user_role = #{employeeVO.userRole}
+                </if>
+                <if test="employeeVO.phone != null and employeeVO.phone != ''">
+                    AND gc.phone = #{employeeVO.phone}
+                </if>
+                <if test="employeeVO.shopName != null and employeeVO.shopName != ''">
+                    AND gc.shop_name = #{employeeVO.shopName}
+                </if>
+                <if test="employeeVO.beginTime != null and employeeVO.beginTime != ''">
+                    AND gc.register_time &gt; #{employeeVO.beginTime}
+                </if>
+                <if test="employeeVO.endTime != null and employeeVO.endTime != ''">
+                    AND gc.register_time &lt; #{employeeVO.endTime}
+                </if>
+            </if>
+        </where>
+    </select>
+
+    <update id="updateTypeByJNumber">
+        update group_staff set type = #{type} where job_number = #{jobNumber}
+            AND exists(
+                select id from (
+                    select id from group_staff WHERE job_number = #{jobNumber} AND type = 0
+                    ) gs
+            )
+    </update>
+
+    <update id="updateEmployeeByJNumber" parameterType="cn.youxu.shop.entity.EmployeeDTO">
+        update group_chief set
+        <if test="employeeDTO.shopName != null and employeeDTO.shopName != ''">
+            shop_name = #{employeeDTO.shopName},
+        </if>
+        <if test="employeeDTO.phone != null and employeeDTO.phone != ''">
+            phone = #{employeeDTO.phone},
+        </if>
+        <if test="employeeDTO.address != null and employeeDTO.address != ''">
+            address = #{employeeDTO.address},
+        </if>
+        <if test="employeeDTO.shopLogo != null and employeeDTO.shopLogo != ''">
+            shop_logo = #{employeeDTO.shopLogo},
+        </if>
+        <if test="employeeDTO.shopDescribe != null and employeeDTO.shopDescribe != ''">
+            shop_describe = #{employeeDTO.shopDescribe},
+        </if>
+        <if test="employeeDTO.shopCoordinate != null and employeeDTO.shopCoordinate != ''">
+            shop_coordinate = #{employeeDTO.shopCoordinate}
+        </if>
+        WHERE job_number = #{employeeDTO.jobNumber}
+    </update>
+
+</mapper>

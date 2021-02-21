@@ -32,4 +32,13 @@ dubbo:
   registry:
     address: zookeeper://127.0.0.1:2181
     simplified: true
-    
+
+tengxun:
+  cos_secretid: AKID3uWnAHGl7G9rMbCNsSpxsZ1D9pIYtIm0
+  cos_secretkey: 81gCxYzA6nEPN7bpnWrwlNnx50g6GAsM
+  cos_region: ap-nanjing
+  bucket_name: group-shop-1301453407
+
+logging:
+  level:
+    cn.youxu.shop.mapper: DEBUG

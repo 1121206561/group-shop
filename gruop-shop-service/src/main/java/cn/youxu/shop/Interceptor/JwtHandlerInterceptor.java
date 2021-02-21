@@ -5,9 +5,11 @@ import cn.youxu.shop.common.CommonResponse;
 import cn.youxu.shop.utils.JWTUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +19,7 @@ import java.io.IOException;
 /**
  * 拦截器拦截进行token验证
  */
+@Component
 public class JwtHandlerInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -24,10 +27,12 @@ public class JwtHandlerInterceptor extends HandlerInterceptorAdapter {
         setHeader(request, response);
         //如果是options类型的请求直接放行
         if (request.getMethod().equals(RequestMethod.OPTIONS.name())) {
-
             return true;
         }
-        //设置跨域--结束
+        //如果是静态资源直接放行
+        if (handler instanceof ResourceHttpRequestHandler){
+            return true;
+        }
         //拦截获取添加在适配器上的注解，判断是否有添加的放行注解
         HandlerMethod method = (HandlerMethod) handler;
         FilterFrom filterFrom = method.getMethodAnnotation(FilterFrom.class);

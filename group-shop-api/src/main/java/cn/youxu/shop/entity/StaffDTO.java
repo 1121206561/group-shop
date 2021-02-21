@@ -6,10 +6,11 @@ import lombok.Data;
 public class StaffDTO {
     private Integer id;
     private String name;
-    private Integer jobNumber;
+    private String jobNumber;
     private Integer sexId;
     private String sex;
     private String avatar;
     private Integer userRoleId;
     private String userRole;
+    private String content;
 }

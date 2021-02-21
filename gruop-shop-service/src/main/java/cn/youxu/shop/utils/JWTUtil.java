@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JWTUtil {//过期时间
-    private static final long EXPIRE_TIME = 15 * 60 * 1000;//默认15分钟
+    private static final long EXPIRE_TIME = 15 * 60 * 1000 * 4;//默认15分钟
     //私钥
     private static final String TOKEN_SECRET = "privateKey";
 
