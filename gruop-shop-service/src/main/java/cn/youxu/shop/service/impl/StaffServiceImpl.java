@@ -10,6 +10,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
+    @Transactional
     public void updateTypeByJNumber(String jobNumber) throws Exception {
         Integer type = 1;
         if (staffMapper.updateTypeByJNumber(jobNumber, type) != 1){
@@ -41,9 +43,15 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
+    @Transactional
     public void updateEmployeeByJNumber(EmployeeDTO employeeDTO) throws Exception {
         if (staffMapper.updateEmployeeByJNumber(employeeDTO) != 1){
             throw new ServiceException("团长信息更新失败");
         }
+    }
+
+    @Override
+    public String getEmployeeAddress(String name, String jobNumber, String shopName) {
+        return staffMapper.getEmployeeAddress(name,jobNumber,shopName);
     }
 }

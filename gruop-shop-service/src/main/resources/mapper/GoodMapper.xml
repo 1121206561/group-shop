@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.youxu.shop.mapper.GoodMapper">
+
+    <resultMap id="GoodSortDTO" type="cn.youxu.shop.entity.GoodSortDTO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="superior_id" property="superiorId" jdbcType="INTEGER"/>
+        <result column="superior_name" property="superiorName" jdbcType="VARCHAR"/>
+        <result column="category_name" property="categoryName" jdbcType="VARCHAR"/>
+        <result column="category_icon" property="categoryIcon" jdbcType="VARCHAR"/>
+        <result column="theme_picture" property="themePicture" jdbcType="VARCHAR"/>
+        <result column="sort_number" property="sortNumber" jdbcType="INTEGER"/>
+        <result column="effective_time" property="effectiveTime" jdbcType="VARCHAR"/>
+        <result column="is_show" property="isShow" jdbcType="INTEGER"/>
+        <result column="is_max_level" property="isMaxLevel" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="getGoodsSort" resultMap="GoodSortDTO">
+        SELECT gg.id,gg.superior_id,gg2.category_name as superior_name,gg.category_name,gg.is_max_level,
+        gg.category_icon,gg.theme_picture,gg.sort_number,gg.effective_time,gg.is_show
+        FROM group_goods gg left JOIN (SELECT superior_id,category_name FROM group_goods WHERE is_deleted = 0 AND
+        is_max_level = 0) gg2
+        ON gg.superior_id = gg2.superior_id
+        <where>
+            gg.is_deleted = 0
+            <if test="maxLevel != null">
+                AND gg.is_max_level = #{maxLevel}
+            </if>
+        </where>
+        ORDER BY gg.superior_id,gg.is_max_level
+    </select>
+
+    <update id="updateIsShow">
+        UPDATE group_goods SET is_show = #{isShow} WHERE id = #{id};
+    </update>
+
+    <select id="selectGoodById" resultMap="GoodSortDTO">
+        select id,superior_id,is_max_level FROM group_goods WHERE id = #{id}
+    </select>
+
+    <update id="deleteGoodsById">
+        UPDATE group_goods SET is_deleted = 1
+        <where>
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+            <if test="superiorId != null">
+                AND superior_id = #{superiorId}
+            </if>
+        </where>
+    </update>
+
+    <insert id="updateOrAddEmployeeById" parameterType="cn.youxu.shop.entity.GoodSortVO">
+        replace into group_goods(
+        id,superior_id,category_name,sort_number,effective_time
+        <if test="goodSortVO.categoryIcon!= null and goodSortVO.categoryIcon != ''">
+            ,category_icon
+        </if>
+        <if test="goodSortVO.themePicture!= null and goodSortVO.themePicture!=''">
+            ,theme_picture
+        </if>
+        <if test="goodSortVO.isShow!= null">
+            ,is_show
+        </if>
+        <if test="goodSortVO.isMaxLevel!= null">
+            ,is_max_level
+        </if>
+        ) values(
+        #{goodSortVO.id},#{goodSortVO.superiorId},#{goodSortVO.categoryName}
+        ,#{goodSortVO.sortNumber},#{goodSortVO.effectiveTime}
+        <if test="goodSortVO.categoryIcon!= null and goodSortVO.categoryIcon != ''">
+            ,#{goodSortVO.categoryIcon}
+        </if>
+        <if test="goodSortVO.themePicture!= null and goodSortVO.themePicture!=''">
+            ,#{goodSortVO.themePicture}
+        </if>
+        <if test="goodSortVO.isShow!= null">
+            ,#{goodSortVO.isShow}
+        </if>
+        <if test="goodSortVO.isMaxLevel!= null">
+            ,#{goodSortVO.isMaxLevel}
+        </if>
+        )
+    </insert>
+
+    <select id="getMaxSuppId" resultType="integer">
+        SELECT superior_id FROM group_goods WHERE is_deleted = 0 order by superior_id desc limit 0,1
+    </select>
+</mapper>

@@ -17,4 +17,6 @@ public interface StaffMapper {
     int updateTypeByJNumber(@Param("jobNumber") String jobNumber, @Param("type") Integer type);
 
     int updateEmployeeByJNumber(@Param("employeeDTO") EmployeeDTO employeeDTO);
+
+    String getEmployeeAddress(@Param("name") String name, @Param("jobNumber") String jobNumber, @Param("shopName") String shopName);
 }

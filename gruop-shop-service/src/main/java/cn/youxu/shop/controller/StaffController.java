@@ -65,4 +65,17 @@ public class StaffController {
             return CommonResponse.error().message(e.getMessage());
         }
     }
+
+    @GetMapping("/getEmployee")
+    @ApiOperation("团长地址查询")
+    public CommonResponse getEmployeeAddress(@RequestParam(required = false) String name,
+                                      @RequestParam(required = false) String jobNumber,
+                                      @RequestParam(required = false) String shopName) {
+        try {
+            return CommonResponse.ok().data("address", staffService.getEmployeeAddress(name, jobNumber, shopName));
+        } catch (Exception e) {
+            return CommonResponse.error();
+        }
+    }
+
 }

@@ -13,4 +13,6 @@ public interface StaffService {
     void updateTypeByJNumber(String jobNumber) throws Exception;
 
     void updateEmployeeByJNumber(EmployeeDTO employeeDTO) throws Exception;
+
+    String getEmployeeAddress(String name, String jobNumber, String shopName);
 }
