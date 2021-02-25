@@ -15,6 +15,28 @@
         <result column="is_max_level" property="isMaxLevel" jdbcType="INTEGER"/>
     </resultMap>
 
+    <resultMap id="GoodTradeDTO" type="cn.youxu.shop.entity.GoodTradeDTO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="trade_sort_id" property="tradeSortId" jdbcType="INTEGER"/>
+        <result column="trade_job_number" property="tradeJobNumber" jdbcType="VARCHAR"/>
+        <result column="trade_name" property="tradeName" jdbcType="VARCHAR"/>
+        <result column="trade_picture" property="tradePicture" jdbcType="VARCHAR"/>
+        <result column="trade_sort_name" property="tradeSortName" jdbcType="VARCHAR"/>
+        <result column="trade_job_number_name" property="tradeJobNumberName" jdbcType="VARCHAR"/>
+        <result column="sort_number" property="sortNumber" jdbcType="INTEGER"/>
+        <result column="trade_content" property="tradeContent" jdbcType="VARCHAR"/>
+        <result column="trade_job_number_type" property="tradeJobNumberType" jdbcType="INTEGER"/>
+        <result column="is_grounding" property="isGrounding" jdbcType="INTEGER"/>
+        <result column="is_explosive" property="isExplosive" jdbcType="INTEGER"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="INTEGER"/>
+
+        <result column="trade_product_price" property="tradeProductPrice" jdbcType="DECIMAL"/>
+        <result column="trade_market_price" property="tradeMarketPrice" jdbcType="DECIMAL"/>
+        <result column="trade_commission" property="tradeCommission" jdbcType="INTEGER"/>
+        <result column="trade_surplus" property="tradeSurplus" jdbcType="INTEGER"/>
+        <result column="trade_sales_volume" property="tradeSalesVolume" jdbcType="INTEGER"/>
+    </resultMap>
+
     <select id="getGoodsSort" resultMap="GoodSortDTO">
         SELECT gg.id,gg.superior_id,gg2.category_name as superior_name,gg.category_name,gg.is_max_level,
         gg.category_icon,gg.theme_picture,gg.sort_number,gg.effective_time,gg.is_show
@@ -50,6 +72,7 @@
         </where>
     </update>
 
+    <!-- 由于先删除在添加，会导致不想改变的数据变成默认值-->
     <insert id="updateOrAddEmployeeById" parameterType="cn.youxu.shop.entity.GoodSortVO">
         replace into group_goods(
         id,superior_id,category_name,sort_number,effective_time
@@ -86,4 +109,103 @@
     <select id="getMaxSuppId" resultType="integer">
         SELECT superior_id FROM group_goods WHERE is_deleted = 0 order by superior_id desc limit 0,1
     </select>
+
+    <select id="getGoodsTrade" resultMap="GoodTradeDTO">
+        SELECT gt.id,gt.trade_name,gt.trade_picture,gt.trade_sort_id,gg.category_name as trade_sort_name,
+        gt.trade_job_number,gc.shop_name as
+        trade_job_number_name,gt.trade_job_number_type,gt.trade_content,gt.is_grounding,
+        gt.is_explosive,gt.sort_number,gt.is_deleted,gti.trade_product_price,gti.trade_market_price,gti.trade_commission,
+        gti.trade_surplus,gti.trade_sales_volume
+        FROM group_trade gt
+        LEFT JOIN group_goods gg ON gt.trade_sort_id = gg.id AND gg.is_deleted = 0
+        LEFT JOIN group_chief gc ON gt.trade_job_number = gc.job_number
+        LEFT JOIN group_staff gs ON gc.job_number = gs.job_number
+        LEFT JOIN group_trade_item gti ON gt.id = gti.trade_id AND gti.is_deleted = 0
+        <where>
+            <if test="tradeName != null and  tradeName != ''">
+                AND gt.trade_name = #{tradeName}
+            </if>
+            <if test="sortId != null">
+                AND gt.trade_sort_id = #{sortId}
+            </if>
+            <if test="tradeJobNumber != null">
+                AND gt.trade_job_number = #{tradeJobNumber}
+            </if>
+            AND gt.is_deleted = 0 AND gs.type = 1
+        </where>
+        order by gt.trade_sort_id desc
+    </select>
+
+    <update id="updateTradeTypeById">
+        <if test="isExplosive != null or isGrounding != null">
+            UPDATE group_trade
+            <set>
+                <if test="isExplosive != null">
+                    is_explosive = #{isExplosive}
+                </if>
+                <if test="isGrounding != null">
+                    is_grounding = #{isGrounding}
+                </if>
+            </set>
+            where is_deleted = 0 AND id = #{id}
+        </if>
+    </update>
+
+    <update id="deleteGoodTradeById">
+        <if test="id != null">
+            UPDATE group_trade gt
+            INNER JOIN group_trade_item gti
+            ON gt.id = gti.trade_id
+            SET gt.is_deleted = 1,gti.is_deleted = 1
+            <where>
+                <if test="id != null">
+                    AND gt.id = #{id}
+                </if>
+            </where>
+        </if>
+    </update>
+
+    <insert id="addGoodTrade" parameterType="cn.youxu.shop.entity.GoodTradeDTO" useGeneratedKeys = "true" keyProperty="goodTradeDTO.id" keyColumn="id">
+        replace into group_trade(
+        id,trade_name,trade_sort_id,trade_job_number_type,trade_job_number
+        <if test="goodTradeDTO.tradePicture != null and goodTradeDTO.tradePicture != ''">
+            ,trade_picture
+        </if>
+        <if test="goodTradeDTO.tradeContent != null and goodTradeDTO.tradeContent != ''">
+            ,trade_content
+        </if>
+        <if test="goodTradeDTO.sortNumber != null">
+            ,sort_number
+        </if>
+        ) values(
+        #{goodTradeDTO.id},#{goodTradeDTO.tradeName},#{goodTradeDTO.tradeSortId},#{goodTradeDTO.tradeJobNumberType},#{goodTradeDTO.tradeJobNumber}
+        <if test="goodTradeDTO.tradePicture != null and goodTradeDTO.tradePicture != ''">
+            ,#{goodTradeDTO.tradePicture}
+        </if>
+        <if test="goodTradeDTO.tradeContent != null and goodTradeDTO.tradeContent != ''">
+            ,#{goodTradeDTO.tradeContent}
+        </if>
+        <if test="goodTradeDTO.sortNumber != null">
+            ,#{goodTradeDTO.sortNumber}
+        </if>
+        )
+    </insert>
+
+    <update id="updateGoodTradeById" parameterType="cn.youxu.shop.entity.GoodTradeDTO">
+        UPDATE group_trade SET trade_name = #{goodTradeDTO.tradeName},
+        trade_sort_id = #{goodTradeDTO.tradeSortId}, trade_picture=#{goodTradeDTO.tradePicture},
+        trade_content = #{goodTradeDTO.tradeContent}, sort_number = #{goodTradeDTO.sortNumber}
+        WHERE id = #{goodTradeDTO.id}
+    </update>
+
+    <update id="updateGoodTradeItemByTradeId">
+        UPDATE group_trade_item SET trade_product_price = #{goodTradeDTO.tradeProductPrice},
+        trade_market_price = #{goodTradeDTO.tradeMarketPrice},trade_commission = #{goodTradeDTO.tradeCommission},
+        trade_surplus = #{goodTradeDTO.tradeSurplus},trade_sales_volume = #{goodTradeDTO.tradeSalesVolume}
+        WHERE trade_id = #{goodTradeDTO.id}
+    </update>
+
+    <insert id="addGoodTradeItem" parameterType="cn.youxu.shop.entity.GoodTradeDTO">
+       INSERT INTO group_trade_item(trade_id ,trade_market_price,trade_commission) VALUES (#{goodTradeDTO.id},#{goodTradeDTO.tradeMarketPrice},#{goodTradeDTO.tradeCommission})
+    </insert>
 </mapper>

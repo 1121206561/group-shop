@@ -5,6 +5,9 @@ import cn.youxu.shop.entity.EmployeeVO;
 import cn.youxu.shop.entity.StaffDTO;
 import com.github.pagehelper.PageInfo;
 
+import java.util.List;
+import java.util.Map;
+
 public interface StaffService {
     PageInfo<StaffDTO> getStaffs(String name, String jobNumber, String userRole, Integer page, Integer size);
 
@@ -15,4 +18,6 @@ public interface StaffService {
     void updateEmployeeByJNumber(EmployeeDTO employeeDTO) throws Exception;
 
     String getEmployeeAddress(String name, String jobNumber, String shopName);
+
+    Map<String, List<EmployeeDTO>> getStaffMap();
 }

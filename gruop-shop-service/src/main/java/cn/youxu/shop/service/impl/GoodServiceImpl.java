@@ -2,6 +2,7 @@ package cn.youxu.shop.service.impl;
 
 import cn.youxu.shop.entity.GoodSortDTO;
 import cn.youxu.shop.entity.GoodSortVO;
+import cn.youxu.shop.entity.GoodTradeDTO;
 import cn.youxu.shop.entity.StaffDTO;
 import cn.youxu.shop.exception.ServiceException;
 import cn.youxu.shop.mapper.GoodMapper;
@@ -25,7 +26,7 @@ public class GoodServiceImpl implements GoodService {
 
 
     @Override
-    public PageInfo<GoodSortDTO> getGoodsSort(Integer maxLevel,Integer page, Integer size) {
+    public PageInfo<GoodSortDTO> getGoodsSort(Integer maxLevel, Integer page, Integer size) {
         PageHelper.startPage(page, size);
         List<GoodSortDTO> goodsSort = goodMapper.getGoodsSort(maxLevel);
         goodsSort.forEach(GoodSortDTO::updateCategoryName);
@@ -56,9 +57,41 @@ public class GoodServiceImpl implements GoodService {
     @Override
     public void updateOrAddEmployeeById(GoodSortVO goodSortVO) {
         goodSortVO.updateCategoryName();
-        if(goodSortVO.getIsMaxLevel() == 0){
+        if (goodSortVO.getIsMaxLevel() == 0) {
             goodSortVO.setSuperiorId(goodMapper.getMaxSuppId() + 1);
         }
         goodMapper.updateOrAddEmployeeById(goodSortVO);
+    }
+
+    @Override
+    public PageInfo<GoodTradeDTO> getGoodsTrade(String tradeName, Integer sortId, String tradeJobNumber, Integer page, Integer size) {
+        PageHelper.startPage(page, size);
+        return new PageInfo<>(goodMapper.getGoodsTrade(tradeName, tradeJobNumber, sortId));
+    }
+
+    @Override
+    @Transactional
+    public void updateTradeTypeById(Integer id, Integer isGrounding, Integer isExplosive) throws Exception {
+        if (goodMapper.updateTradeTypeById(id, isGrounding, isExplosive) > 1) {
+            throw new ServiceException("更新异常");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteGoodTradeById(Integer id) throws Exception {
+        goodMapper.deleteGoodTradeById(id);
+    }
+
+    @Override
+    @Transactional
+    public void updateOrAddGoodTradeById(GoodTradeDTO goodTradeDTO) throws Exception {
+        if (goodTradeDTO.getId() != null) {
+            goodMapper.updateGoodTradeById(goodTradeDTO);
+            goodMapper.updateGoodTradeItemByTradeId(goodTradeDTO);
+        } else {
+            goodMapper.addGoodTrade(goodTradeDTO);
+            goodMapper.addGoodTradeItem(goodTradeDTO);
+        }
     }
 }

@@ -78,4 +78,14 @@ public class StaffController {
         }
     }
 
+    @GetMapping("/getStaffMap")
+    @ApiOperation("获取自营团长和代理团长")
+    public CommonResponse getStaffMap() {
+        try {
+            return CommonResponse.ok().data("map", staffService.getStaffMap());
+        } catch (Exception e) {
+            return CommonResponse.error();
+        }
+    }
+
 }

@@ -12,7 +12,10 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class StaffServiceImpl implements StaffService {
@@ -20,7 +23,7 @@ public class StaffServiceImpl implements StaffService {
     private StaffMapper staffMapper;
 
     @Override
-    public PageInfo<StaffDTO> getStaffs(String name, String jobNumber,String userRole, Integer page, Integer size) {
+    public PageInfo<StaffDTO> getStaffs(String name, String jobNumber, String userRole, Integer page, Integer size) {
         PageHelper.startPage(page, size);
         List<StaffDTO> staffs = staffMapper.getStaffs(name, jobNumber, userRole);
         PageInfo staffDTOPageInfo = new PageInfo<>(staffs);
@@ -37,7 +40,7 @@ public class StaffServiceImpl implements StaffService {
     @Transactional
     public void updateTypeByJNumber(String jobNumber) throws Exception {
         Integer type = 1;
-        if (staffMapper.updateTypeByJNumber(jobNumber, type) != 1){
+        if (staffMapper.updateTypeByJNumber(jobNumber, type) != 1) {
             throw new ServiceException("该团长不能被审核");
         }
     }
@@ -45,13 +48,23 @@ public class StaffServiceImpl implements StaffService {
     @Override
     @Transactional
     public void updateEmployeeByJNumber(EmployeeDTO employeeDTO) throws Exception {
-        if (staffMapper.updateEmployeeByJNumber(employeeDTO) != 1){
+        if (staffMapper.updateEmployeeByJNumber(employeeDTO) != 1) {
             throw new ServiceException("团长信息更新失败");
         }
     }
 
     @Override
     public String getEmployeeAddress(String name, String jobNumber, String shopName) {
-        return staffMapper.getEmployeeAddress(name,jobNumber,shopName);
+        return staffMapper.getEmployeeAddress(name, jobNumber, shopName);
+    }
+
+    @Override
+    public Map<String, List<EmployeeDTO>> getStaffMap() {
+        List<EmployeeDTO> employees = staffMapper.getEmployees(new EmployeeVO());
+        Map<Integer, List<EmployeeDTO>> collect = employees.stream().collect(Collectors.groupingBy(EmployeeDTO::getUserRoleId));
+        Map<String, List<EmployeeDTO>> tempMap = new HashMap<>();
+        tempMap.put("agentStaff", collect.get(1));
+        tempMap.put("autarkyStaff", collect.get(2));
+        return tempMap;
     }
 }
