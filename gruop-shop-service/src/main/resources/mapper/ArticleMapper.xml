@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.youxu.shop.mapper.ArticleMapper">
+
+    <resultMap id="ArticleSortDTO" type="cn.youxu.shop.entity.ArticleSortDTO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="superior_id" property="superiorId" jdbcType="INTEGER"/>
+        <result column="superior_name" property="superiorName" jdbcType="VARCHAR"/>
+        <result column="article_name" property="articleName" jdbcType="VARCHAR"/>
+        <result column="sort_number" property="sortNumber" jdbcType="INTEGER"/>
+        <result column="is_show" property="isShow" jdbcType="INTEGER"/>
+        <result column="is_max_level" property="isMaxLevel" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="EssayDTO" type="cn.youxu.shop.entity.EssayDTO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="essay_sort_id" property="essaySortId" jdbcType="INTEGER"/>
+        <result column="essay_name" property="essayName" jdbcType="VARCHAR"/>
+        <result column="essay_sort_name" property="essaySortName" jdbcType="VARCHAR"/>
+        <result column="essay_content" property="essayContent" jdbcType="VARCHAR"/>
+        <result column="essay_picture" property="essayPicture" jdbcType="VARCHAR"/>
+        <result column="sort_number" property="sortNumber" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="getArticlesSort" resultMap="ArticleSortDTO">
+        SELECT ga.id,ga.superior_id,ga2.article_name as superior_name,ga.article_name,ga.is_max_level,
+        ga.sort_number,ga.is_show
+        FROM group_article ga left JOIN (SELECT superior_id,article_name FROM group_article WHERE is_deleted = 0 AND
+        is_max_level = 0) ga2
+        ON ga.superior_id = ga2.superior_id
+        <where>
+            ga.is_deleted = 0
+            <if test="maxLevel != null">
+                AND ga.is_max_level = #{maxLevel}
+            </if>
+        </where>
+        ORDER BY ga.superior_id,ga.is_max_level
+    </select>
+
+    <update id="updateIsShow">
+        UPDATE group_article SET is_show = #{isShow} WHERE id = #{id};
+    </update>
+
+    <select id="selectArticleById" resultMap="ArticleSortDTO">
+        select id,superior_id,is_max_level FROM group_article WHERE id = #{id}
+    </select>
+
+    <update id="deleteArticlesById">
+        UPDATE group_article SET is_deleted = 1
+        <where>
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+            <if test="superiorId != null">
+                AND superior_id = #{superiorId}
+            </if>
+        </where>
+    </update>
+
+    <select id="getMaxSuppId" resultType="integer">
+        SELECT superior_id FROM group_article WHERE is_deleted = 0 order by superior_id desc limit 0,1
+    </select>
+
+    <insert id="updateOrAddArticleById" parameterType="cn.youxu.shop.entity.ArticleSortDTO">
+        replace into group_article(
+        id,superior_id,article_name,sort_number
+        <if test="articleSortDTO.isShow!= null">
+            ,is_show
+        </if>
+        <if test="articleSortDTO.isMaxLevel!= null">
+            ,is_max_level
+        </if>
+        ) values(
+        #{articleSortDTO.id},#{articleSortDTO.superiorId},#{articleSortDTO.articleName}
+        ,#{articleSortDTO.sortNumber}
+        <if test="articleSortDTO.isShow!= null">
+            ,#{articleSortDTO.isShow}
+        </if>
+        <if test="articleSortDTO.isMaxLevel!= null">
+            ,#{articleSortDTO.isMaxLevel}
+        </if>
+        )
+    </insert>
+
+    <select id="getEssayList" resultMap="EssayDTO">
+     SELECT gs.id,gs.essay_name,gs.essay_sort_id,gs.sort_number,gs.essay_content,gs.essay_picture
+     ,ga.article_name as essay_sort_name
+     FROM group_essay gs LEFT JOIN group_article ga ON gs.essay_sort_id = ga.id
+     <where>
+         <if test="essayName!= null and essayName != ''">
+              AND gs.essay_name LIKE "%"#{essayName}"%"
+         </if>
+         <if test="sortId != null">
+             AND gs.essay_sort_id = #{sortId}
+         </if>
+         AND gs.is_deleted = 0
+     </where>
+    </select>
+
+    <update id="deleteEssayById">
+        <if test="id != null">
+            UPDATE group_essay
+            SET is_deleted = 1
+            <where>
+                <if test="id != null">
+                    AND id = #{id}
+                </if>
+            </where>
+        </if>
+    </update>
+
+
+    <insert id="updateOrAddEssayById" parameterType="cn.youxu.shop.entity.EssayDTO">
+        replace into group_essay(
+        id,essay_name,essay_sort_id,sort_number
+        <if test="essayDTO.essayContent!= null and essayDTO.essayContent!= ''">
+            ,essay_content
+        </if>
+        <if test="essayDTO.essayPicture!= null and essayDTO.essayPicture!= ''">
+            ,essay_picture
+        </if>
+        ) values(
+        #{essayDTO.id},#{essayDTO.essayName},#{essayDTO.essaySortId}
+        ,#{essayDTO.sortNumber}
+        <if test="essayDTO.essayContent!= null and essayDTO.essayContent!= ''">
+            ,#{essayDTO.essayContent}
+        </if>
+        <if test="essayDTO.essayPicture!= null and essayDTO.essayPicture!= ''">
+            ,#{essayDTO.essayPicture}
+        </if>
+        )
+    </insert>
+
+</mapper>

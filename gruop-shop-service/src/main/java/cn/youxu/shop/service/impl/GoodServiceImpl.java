@@ -57,7 +57,7 @@ public class GoodServiceImpl implements GoodService {
     @Override
     public void updateOrAddEmployeeById(GoodSortVO goodSortVO) {
         goodSortVO.updateCategoryName();
-        if (goodSortVO.getIsMaxLevel() == 0) {
+        if (goodSortVO.getId() == null) {
             goodSortVO.setSuperiorId(goodMapper.getMaxSuppId() + 1);
         }
         goodMapper.updateOrAddEmployeeById(goodSortVO);
