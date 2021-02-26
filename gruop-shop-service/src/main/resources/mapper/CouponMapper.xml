@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.youxu.shop.mapper.CouponMapper">
+
+    <resultMap id="CouponDTO" type="cn.youxu.shop.entity.CouponDTO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="coupon_name" property="couponName" jdbcType="VARCHAR"/>
+        <result column="coupon_picture" property="couponPicture" jdbcType="VARCHAR"/>
+        <result column="coupon_user_des" property="couponUserDes" jdbcType="VARCHAR"/>
+        <result column="coupon_user" property="couponUser" jdbcType="INTEGER"/>
+        <result column="coupon_time" property="couponTime" jdbcType="VARCHAR"/>
+        <result column="coupon_draw" property="couponDraw" jdbcType="INTEGER"/>
+        <result column="coupon_threshold" property="couponThreshold" jdbcType="DECIMAL"/>
+        <result column="coupon_money" property="couponMoney" jdbcType="DECIMAL"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="getCouponList" resultMap="CouponDTO">
+        SELECT gc.id,gc.coupon_name,gc.coupon_picture,gc.coupon_user,gc.coupon_time,
+        gc.coupon_draw,gc.coupon_threshold,gc.coupon_money,gc.is_deleted,d.describe as coupon_user_des
+        FROM group_coupon gc LEFT JOIN dictionary d ON d.colum = 'coupon_user' AND d.sense = gc.coupon_user
+        <where>
+            <if test="couponMoney != null">
+                AND gc.coupon_money = #{couponMoney}
+            </if>
+            <if test="couponThreshold != null">
+                AND gc.coupon_threshold = #{couponThreshold}
+            </if>
+            AND gc.is_deleted = 0
+        </where>
+    </select>
+
+    <insert id="updateOrAddCouponById" parameterType="cn.youxu.shop.entity.CouponDTO">
+        INSERT INTO group_coupon (coupon_name,coupon_user,coupon_time,coupon_draw,coupon_threshold,coupon_money
+        <if test="couponDTO.couponPicture != null and couponDTO.couponPicture !=''">
+             ,coupon_picture
+        </if>
+        ) values (
+        #{couponDTO.couponName},#{couponDTO.couponUser},#{couponDTO.couponTime},#{couponDTO.couponDraw}
+        ,#{couponDTO.couponThreshold},#{couponDTO.couponMoney}
+        <if test="couponDTO.couponPicture != null and couponDTO.couponPicture !=''">
+            ,#{couponDTO.couponPicture}
+        </if>
+        )
+    </insert>
+
+    <update id="delayTime">
+        UPDATE group_coupon SET coupon_time = #{delayTime}
+        WHERE id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
+</mapper>
