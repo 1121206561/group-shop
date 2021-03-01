@@ -114,4 +114,16 @@ public class OrderController {
             return CommonResponse.error();
         }
     }
+
+    @GetMapping("/getOrderDeliveryList")
+    @ApiOperation("配送员管理")
+    public CommonResponse getOrderDeliveryList(@RequestParam(required = false) String orderItemNo,
+                                             @RequestParam(required = false, defaultValue = "1") Integer page,
+                                             @RequestParam(required = false, defaultValue = "100") Integer size) {
+        try {
+            return CommonResponse.ok().data("content", orderService.getOrderDeliveryList(orderItemNo,page, size));
+        } catch (Exception e) {
+            return CommonResponse.error();
+        }
+    }
 }

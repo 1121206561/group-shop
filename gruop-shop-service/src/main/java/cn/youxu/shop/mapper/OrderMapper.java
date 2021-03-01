@@ -1,9 +1,6 @@
 package cn.youxu.shop.mapper;
 
-import cn.youxu.shop.entity.OrderAssessDTO;
-import cn.youxu.shop.entity.OrderDTO;
-import cn.youxu.shop.entity.OrderItemDTO;
-import cn.youxu.shop.entity.OrderModel;
+import cn.youxu.shop.entity.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -34,4 +31,6 @@ public interface OrderMapper {
                                             @Param("beginCreationTime")String beginCreationTime, @Param("endCreationTime")String endCreationTime);
 
     void updateAssessTypeById(@Param("orderAssessDTO") OrderAssessDTO orderAssessDTO);
+
+    List<OrderDeliveryDTO> getOrderDeliveryList(@Param("orderItemNo") String orderItemNo);
 }

@@ -55,6 +55,17 @@
         <result column="type_name" property="typeName" jdbcType="VARCHAR"/>
     </resultMap>
 
+    <resultMap id="OrderDeliveryDTO" type="cn.youxu.shop.entity.OrderDeliveryDTO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="delivery_man" property="deliveryMan" jdbcType="VARCHAR"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="commission_way" property="commissionWay" jdbcType="INTEGER"/>
+        <result column="commission_way_name" property="commissionWayName" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="type_name" property="typeName" jdbcType="VARCHAR"/>
+    </resultMap>
+
     <select id="getOrderList" resultMap="OrderDTO">
         SELECT go.id,gt.trade_job_number as staff_number,gt.trade_name as trade_id_name,gs.name as staff_number_name,
         go.order_no,go.trade_id,go.creation_time,go.supplier_address,go.logistics_order_no,
@@ -225,4 +236,18 @@
         UPDATE group_assess SET type = 1,result = #{orderAssessDTO.result}
         WHERE id = #{orderAssessDTO.id}
     </update>
+
+    <select id="getOrderDeliveryList" resultMap="OrderDeliveryDTO">
+         SELECT gd.id,gd.delivery_man,gd.order_no,gd.commission_way,gd.phone,gd.type,
+         d.describe as type_name ,d1.describe as commission_way_name
+         FROM group_delivery gd
+         LEFT JOIN dictionary d ON d.colum = 'delivery_type' AND d.sense = gd.type
+         LEFT JOIN dictionary d1 ON d1.colum = 'commission_way' AND d1.sense = gd.commission_way
+         <where>
+             <if test="orderItemNo != null and orderItemNo != ''">
+                AND gd.order_no = #{orderItemNo}
+             </if>
+             AND gd.is_deleted = 0
+         </where>
+    </select>
 </mapper>

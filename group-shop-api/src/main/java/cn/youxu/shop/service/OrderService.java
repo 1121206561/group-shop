@@ -1,9 +1,6 @@
 package cn.youxu.shop.service;
 
-import cn.youxu.shop.entity.OrderAssessDTO;
-import cn.youxu.shop.entity.OrderDTO;
-import cn.youxu.shop.entity.OrderItemDTO;
-import cn.youxu.shop.entity.OrderModel;
+import cn.youxu.shop.entity.*;
 import com.github.pagehelper.PageInfo;
 
 import java.util.List;
@@ -20,4 +17,6 @@ public interface OrderService {
     PageInfo<OrderAssessDTO> getOrderAssessList(String orderItemNo, Integer evaluatorId, Integer starRating, Integer type, String beginCreationTime, String endCreationTime, Integer page, Integer size);
 
     void updateAssessTypeById(OrderAssessDTO orderAssessDTO);
+
+    PageInfo<OrderDeliveryDTO> getOrderDeliveryList(String orderItemNo, Integer page, Integer size);
 }

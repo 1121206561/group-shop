@@ -1,9 +1,6 @@
 package cn.youxu.shop.service.impl;
 
-import cn.youxu.shop.entity.OrderAssessDTO;
-import cn.youxu.shop.entity.OrderDTO;
-import cn.youxu.shop.entity.OrderItemDTO;
-import cn.youxu.shop.entity.OrderModel;
+import cn.youxu.shop.entity.*;
 import cn.youxu.shop.exception.ServiceException;
 import cn.youxu.shop.mapper.OrderMapper;
 import cn.youxu.shop.service.OrderService;
@@ -79,5 +76,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void updateAssessTypeById(OrderAssessDTO orderAssessDTO) {
         orderMapper.updateAssessTypeById(orderAssessDTO);
+    }
+
+    @Override
+    public PageInfo<OrderDeliveryDTO> getOrderDeliveryList(String orderItemNo, Integer page, Integer size) {
+        PageHelper.startPage(page, size);
+        return new PageInfo<>(orderMapper.getOrderDeliveryList(orderItemNo));
     }
 }
