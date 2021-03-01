@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.youxu.shop.mapper.OrderMapper">
+
+    <resultMap id="OrderDTO" type="cn.youxu.shop.entity.OrderDTO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="staff_number" property="staffNumber" jdbcType="VARCHAR"/>
+        <result column="staff_number_name" property="staffNumberName" jdbcType="VARCHAR"/>
+        <result column="trade_id" property="tradeId" jdbcType="INTEGER"/>
+        <result column="trade_id_name" property="tradeName" jdbcType="VARCHAR"/>
+        <result column="creation_time" property="creationTime" jdbcType="VARCHAR"/>
+        <result column="supplier_address" property="supplierAddress" jdbcType="VARCHAR"/>
+        <result column="logistics_order_no" property="logisticsOrderNo" jdbcType="VARCHAR"/>
+        <result column="order_user_count" property="orderUserCount" jdbcType="INTEGER"/>
+        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+        <result column="order_type" property="type" jdbcType="INTEGER"/>
+        <result column="order_type_name" property="typeName" jdbcType="VARCHAR"/>
+        <result column="order_count" property="orderCount" jdbcType="INTEGER"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="getOrderList" resultMap="OrderDTO">
+        SELECT go.id,gt.trade_job_number as staff_number,gt.trade_name as trade_id_name,gs.name as staff_number_name,
+        go.order_no,go.trade_id,go.creation_time,go.supplier_address,go.logistics_order_no,
+        go.order_user_count,go.order_money,go.order_type,go.order_count,d.describe as order_type_name
+        FROM group_order go
+        LEFT JOIN group_trade gt ON go.trade_id = gt.id
+        LEFT JOIN group_staff gs ON gt.trade_job_number = gs.job_number
+        LEFT JOIN dictionary d ON d.colum = 'order_type' AND d.sense = go.order_type
+        <where>
+            <if test="type != null">
+                AND go.order_type = #{type}
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                AND go.order_no = #{orderNo}
+            </if>
+            <if test="staffNumber != null and staffNumber != ''">
+                AND gs.job_number = #{staffNumber}
+            </if>
+            <if test="tradeId != null">
+                AND go.trade_id = #{tradeId}
+            </if>
+            <if test="logisticsOrderNo != null and logisticsOrderNo != ''">
+                AND go.logistics_order_no = #{logisticsOrderNo}
+            </if>
+            <if test="beginCreationTime != null and beginCreationTime != ''">
+                AND go.creation_time &gt; #{beginCreationTime}
+            </if>
+            <if test="endCreationTime != null and endCreationTime != ''">
+                AND go.creation_time &lt; #{endCreationTime}
+            </if>
+            AND go.is_deleted = 0
+        </where>
+        order by go.creation_time desc
+    </select>
+
+    <select id="getOrderByOrderNo" resultMap="OrderDTO">
+        SELECT order_type,order_no FROM group_order
+        <where>
+            <if test="orderNo != null and orderNo != ''">
+                AND order_no = #{orderNo}
+            </if>
+            AND is_deleted = 0
+        </where>
+    </select>
+
+    <update id="updateTypeByOrderNo">
+        UPDATE group_order SET order_type =  #{orderType}
+        WHERE order_no = #{orderNo} AND is_deleted = 0
+        AND exists(
+                select id from (
+                    select id from group_order WHERE order_no = #{orderNo} AND order_type = #{afterOrderType}
+                    ) gs
+            )
+    </update>
+
+    <select id="selectByOrderNo" resultMap="OrderDTO">
+        SELECT order_no FROM group_order
+        WHERE order_no IN
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item.orderNo}
+        </foreach>
+    </select>
+
+    <update id="updateLogisticsOrderNo">
+        UPDATE group_order
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="logistics_order_no =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.logisticsOrderNo!=null and item.logisticsOrderNo != ''">
+                        when order_no=#{item.orderNo}
+                        and is_deleted=0
+                        then #{item.logisticsOrderNo}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where order_no in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item.orderNo}
+        </foreach>
+    </update>
+</mapper>

@@ -12,6 +12,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public CommonResponse handleException(Exception e) {
+        System.out.println(e);
         return CommonResponse.error().message("未知异常请联系管理员");
     }
 
