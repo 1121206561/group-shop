@@ -42,6 +42,18 @@
         <result column="pay_way_name" property="payWayName" jdbcType="VARCHAR"/>
     </resultMap>
 
+    <resultMap id="OrderAssessDTO" type="cn.youxu.shop.entity.OrderAssessDTO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_item_no" property="orderItemNo" jdbcType="VARCHAR"/>
+        <result column="evaluator_name" property="evaluatorName" jdbcType="VARCHAR"/>
+        <result column="result" property="result" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="evaluator_id" property="evaluatorId" jdbcType="INTEGER"/>
+        <result column="star_rating" property="starRating" jdbcType="INTEGER"/>
+        <result column="evaluator_time" property="evaluatorTime" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="type_name" property="typeName" jdbcType="VARCHAR"/>
+    </resultMap>
 
     <select id="getOrderList" resultMap="OrderDTO">
         SELECT go.id,gt.trade_job_number as staff_number,gt.trade_name as trade_id_name,gs.name as staff_number_name,
@@ -178,4 +190,39 @@
             and goi.is_deleted = 0
         </where>
     </select>
+
+    <select id="getOrderAssessList" resultMap="OrderAssessDTO">
+       SELECT ga.id,ga.order_item_no,ga.evaluator_id,gu.user_name as evaluator_name,
+       ga.result,ga.content,ga.star_rating,ga.type,ga.evaluator_time,d.describe as type_name
+       FROM group_assess ga
+       LEFT JOIN group_user gu ON ga.evaluator_id = gu.user_number
+       LEFT JOIN dictionary d ON d.colum = 'assess_type' AND d.sense = ga.type
+       <where>
+           <if test="orderItemNo != null and orderItemNo != ''">
+               AND ga.order_item_no = #{orderItemNo}
+           </if>
+           <if test="evaluatorId != null">
+               AND ga.evaluator_id = #{evaluatorId}
+           </if>
+           <if test="starRating != null and starRating != 0">
+               AND ga.star_rating = #{starRating}
+           </if>
+           <if test="type != null">
+               AND ga.type = #{type}
+           </if>
+           <if test="beginCreationTime != null and beginCreationTime != ''">
+               AND ga.evaluator_time &gt; #{beginCreationTime}
+           </if>
+           <if test="endCreationTime != null and endCreationTime != ''">
+               AND ga.evaluator_time &lt; #{endCreationTime}
+           </if>
+           AND ga.is_deleted = 0
+       </where>
+       order by ga.star_rating desc
+    </select>
+
+    <update id="updateAssessTypeById" parameterType="cn.youxu.shop.entity.OrderAssessDTO">
+        UPDATE group_assess SET type = 1,result = #{orderAssessDTO.result}
+        WHERE id = #{orderAssessDTO.id}
+    </update>
 </mapper>

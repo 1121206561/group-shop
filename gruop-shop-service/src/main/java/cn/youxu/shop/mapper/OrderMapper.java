@@ -1,5 +1,6 @@
 package cn.youxu.shop.mapper;
 
+import cn.youxu.shop.entity.OrderAssessDTO;
 import cn.youxu.shop.entity.OrderDTO;
 import cn.youxu.shop.entity.OrderItemDTO;
 import cn.youxu.shop.entity.OrderModel;
@@ -27,4 +28,10 @@ public interface OrderMapper {
                                         @Param("orderItemType")Integer orderItemType, @Param("beginCreationTime")String beginCreationTime,
                                         @Param("endCreationTime")String endCreationTime, @Param("shippWay")Integer shippWay,
                                         @Param("payWay")Integer payWay);
+
+    List<OrderAssessDTO> getOrderAssessList(@Param("orderItemNo")String orderItemNo, @Param("evaluatorId")Integer evaluatorId,
+                                            @Param("starRating")Integer starRating, @Param("type")Integer type,
+                                            @Param("beginCreationTime")String beginCreationTime, @Param("endCreationTime")String endCreationTime);
+
+    void updateAssessTypeById(@Param("orderAssessDTO") OrderAssessDTO orderAssessDTO);
 }

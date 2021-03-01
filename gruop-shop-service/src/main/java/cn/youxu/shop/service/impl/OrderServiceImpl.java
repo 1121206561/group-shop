@@ -1,5 +1,6 @@
 package cn.youxu.shop.service.impl;
 
+import cn.youxu.shop.entity.OrderAssessDTO;
 import cn.youxu.shop.entity.OrderDTO;
 import cn.youxu.shop.entity.OrderItemDTO;
 import cn.youxu.shop.entity.OrderModel;
@@ -12,7 +13,6 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -68,5 +68,16 @@ public class OrderServiceImpl implements OrderService {
         PageHelper.startPage(page, size);
         return new PageInfo<>(orderMapper.getOrderItemList(orderNo, orderItemNo, timeWay, orderUser, orderItemType, beginCreationTime, endCreationTime, shippWay, payWay));
 
+    }
+
+    @Override
+    public PageInfo<OrderAssessDTO> getOrderAssessList(String orderItemNo, Integer evaluatorId, Integer starRating, Integer type, String beginCreationTime, String endCreationTime, Integer page, Integer size) {
+        PageHelper.startPage(page, size);
+        return new PageInfo<>(orderMapper.getOrderAssessList(orderItemNo, evaluatorId, starRating, type, beginCreationTime, endCreationTime));
+    }
+
+    @Override
+    public void updateAssessTypeById(OrderAssessDTO orderAssessDTO) {
+        orderMapper.updateAssessTypeById(orderAssessDTO);
     }
 }

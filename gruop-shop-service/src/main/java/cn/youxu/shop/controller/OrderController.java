@@ -1,6 +1,7 @@
 package cn.youxu.shop.controller;
 
 import cn.youxu.shop.common.CommonResponse;
+import cn.youxu.shop.entity.OrderAssessDTO;
 import cn.youxu.shop.entity.OrderModel;
 import cn.youxu.shop.service.OrderService;
 import cn.youxu.shop.utils.PoiUtil;
@@ -86,4 +87,31 @@ public class OrderController {
         }
     }
 
+    @GetMapping("/getOrderAssessList")
+    @ApiOperation("评价查询")
+    public CommonResponse getOrderAssessList(@RequestParam(required = false) String orderItemNo,
+                                             @RequestParam(required = false) Integer evaluatorId,
+                                             @RequestParam(required = false) String beginCreationTime,
+                                             @RequestParam(required = false) String endCreationTime,
+                                             @RequestParam(required = false) Integer starRating,
+                                             @RequestParam(required = false) Integer type,
+                                             @RequestParam(required = false, defaultValue = "1") Integer page,
+                                             @RequestParam(required = false, defaultValue = "100") Integer size) {
+        try {
+            return CommonResponse.ok().data("content", orderService.getOrderAssessList(orderItemNo, evaluatorId, starRating,
+                    type, beginCreationTime, endCreationTime, page, size));
+        } catch (Exception e) {
+            return CommonResponse.error();
+        }
+    }
+    @PostMapping("/updateAssessTypeById")
+    @ApiOperation("评价状态变更")
+    public CommonResponse updateAssessTypeById(@RequestBody OrderAssessDTO orderAssessDTO) {
+        try {
+            orderService.updateAssessTypeById(orderAssessDTO);
+            return CommonResponse.ok();
+        } catch (Exception e) {
+            return CommonResponse.error();
+        }
+    }
 }
