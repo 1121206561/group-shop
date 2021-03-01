@@ -1,6 +1,7 @@
 package cn.youxu.shop.mapper;
 
 import cn.youxu.shop.entity.OrderDTO;
+import cn.youxu.shop.entity.OrderItemDTO;
 import cn.youxu.shop.entity.OrderModel;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,4 +21,10 @@ public interface OrderMapper {
     void updateLogisticsOrderNo(@Param("list") List<OrderModel> orderModels);
 
     List<OrderDTO> selectByOrderNo(@Param("list") List<OrderModel> orderModels);
+
+    List<OrderItemDTO> getOrderItemList(@Param("orderNo") String orderNo, @Param("orderItemNo")String orderItemNo,
+                                        @Param("timeWay")Integer timeWay, @Param("orderUser")Integer orderUser,
+                                        @Param("orderItemType")Integer orderItemType, @Param("beginCreationTime")String beginCreationTime,
+                                        @Param("endCreationTime")String endCreationTime, @Param("shippWay")Integer shippWay,
+                                        @Param("payWay")Integer payWay);
 }

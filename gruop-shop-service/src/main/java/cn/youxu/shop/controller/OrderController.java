@@ -65,4 +65,25 @@ public class OrderController {
         }
     }
 
+    @GetMapping("/getOrderItemList")
+    @ApiOperation("订单详情查询")
+    public CommonResponse getOrderItemList(@RequestParam(required = false) String orderNo,
+                                           @RequestParam(required = false) String orderItemNo,
+                                           @RequestParam(required = false) Integer timeWay,
+                                           @RequestParam(required = false) Integer orderUser,
+                                           @RequestParam(required = false) String beginCreationTime,
+                                           @RequestParam(required = false) String endCreationTime,
+                                           @RequestParam(required = false) Integer orderItemType,
+                                           @RequestParam(required = false) Integer shippWay,
+                                           @RequestParam(required = false) Integer payWay,
+                                           @RequestParam(required = false, defaultValue = "1") Integer page,
+                                           @RequestParam(required = false, defaultValue = "100") Integer size) {
+        try {
+            return CommonResponse.ok().data("content", orderService.getOrderItemList(orderNo, orderItemNo, timeWay, orderUser,
+                    orderItemType, beginCreationTime, endCreationTime, shippWay, payWay, page, size));
+        } catch (Exception e) {
+            return CommonResponse.error();
+        }
+    }
+
 }

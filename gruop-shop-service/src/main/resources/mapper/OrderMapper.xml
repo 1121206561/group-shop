@@ -20,6 +20,29 @@
         <result column="is_deleted" property="isDeleted" jdbcType="INTEGER"/>
     </resultMap>
 
+    <resultMap id="OrderItemDTO" type="cn.youxu.shop.entity.OrderItemDTO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="order_item_no" property="orderItemNo" jdbcType="VARCHAR"/>
+        <result column="order_user" property="orderUser" jdbcType="INTEGER"/>
+        <result column="order_user_name" property="orderUserName" jdbcType="VARCHAR"/>
+        <result column="order_count" property="orderCount" jdbcType="INTEGER"/>
+        <result column="order_pay_amount" property="orderPayAmount" jdbcType="DECIMAL"/>
+        <result column="order_sum_amount" property="orderSumAmount" jdbcType="DECIMAL"/>
+        <result column="order_coupon_id" property="orderCouponId" jdbcType="INTEGER"/>
+        <result column="order_coupon_name" property="orderCouponName" jdbcType="VARCHAR"/>
+        <result column="pay_time" property="payTime" jdbcType="VARCHAR"/>
+        <result column="order_item_type" property="orderItemType" jdbcType="INTEGER"/>
+        <result column="order_item_name" property="orderItemName" jdbcType="VARCHAR"/>
+        <result column="place_time" property="placeTime" jdbcType="VARCHAR"/>
+        <result column="shipp_way" property="shippWay" jdbcType="INTEGER"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="INTEGER"/>
+        <result column="shipp_way_name" property="shippWayName" jdbcType="VARCHAR"/>
+        <result column="pay_way" property="payWay" jdbcType="INTEGER"/>
+        <result column="pay_way_name" property="payWayName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
     <select id="getOrderList" resultMap="OrderDTO">
         SELECT go.id,gt.trade_job_number as staff_number,gt.trade_name as trade_id_name,gs.name as staff_number_name,
         go.order_no,go.trade_id,go.creation_time,go.supplier_address,go.logistics_order_no,
@@ -101,4 +124,58 @@
             #{item.orderNo}
         </foreach>
     </update>
+
+    <select id="getOrderItemList" resultMap="OrderItemDTO">
+        SELECT goi.id,goi.order_no,goi.order_item_no,goi.order_user,
+        goi.order_count,goi.order_pay_amount,goi.order_sum_amount,goi.order_coupon_id,
+        gc.coupon_name as order_coupon_name,goi.pay_time,goi.order_item_type,d.describe as order_item_name,
+        goi.place_time,goi.shipp_way,d1.describe as shipp_way_name,goi.pay_way,d2.describe as pay_way_name,
+        gu.user_name as order_user_name
+        FROM group_order_item goi
+        LEFT JOIN group_coupon gc ON goi.order_coupon_id = gc.id
+        LEFT JOIN dictionary d ON d.colum = 'order_item_type' AND d.sense = goi.order_item_type
+        LEFT JOIN dictionary d1 ON d1.colum = 'shipp_way' AND d1.sense = goi.shipp_way
+        LEFT JOIN dictionary d2 ON d2.colum = 'pay_way' AND d2.sense = goi.pay_way
+        LEFT JOIN group_user gu ON goi.order_user = gu.user_number
+        <where>
+            <if test="orderNo != null and orderNo != ''">
+               AND goi.order_no = #{orderNo}
+            </if>
+            <if test="orderItemNo != null and orderItemNo != ''">
+                AND goi.order_item_no = #{orderItemNo}
+            </if>
+            <if test="orderUser != null">
+                AND goi.order_user = #{orderUser}
+            </if>
+            <if test="orderItemType != null">
+                AND goi.order_item_type = #{orderItemType}
+            </if>
+            <if test="shippWay != null">
+                AND goi.shipp_way = #{shippWay}
+            </if>
+            <if test="payWay != null">
+                AND goi.pay_way = #{payWay}
+            </if>
+            <if test="timeWay != null and timeWay == 0">
+                <if test="beginCreationTime != null and beginCreationTime != ''">
+                    AND goi.pay_time &gt; #{beginCreationTime}
+                </if>
+                <if test="endCreationTime != null and endCreationTime != ''">
+                    AND goi.pay_time &lt; #{endCreationTime}
+                </if>
+            </if>
+            <if test="timeWay != null and timeWay == 1">
+                <if test="beginCreationTime != null and beginCreationTime != ''">
+                    AND goi.place_time &gt; #{beginCreationTime}
+                </if>
+                <if test="endCreationTime != null and endCreationTime != ''">
+                    AND goi.place_time &lt; #{endCreationTime}
+                </if>
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                AND goi.order_no = #{orderNo}
+            </if>
+            and goi.is_deleted = 0
+        </where>
+    </select>
 </mapper>

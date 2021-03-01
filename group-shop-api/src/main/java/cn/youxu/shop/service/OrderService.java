@@ -1,6 +1,7 @@
 package cn.youxu.shop.service;
 
 import cn.youxu.shop.entity.OrderDTO;
+import cn.youxu.shop.entity.OrderItemDTO;
 import cn.youxu.shop.entity.OrderModel;
 import com.github.pagehelper.PageInfo;
 
@@ -12,4 +13,6 @@ public interface OrderService {
     void updateTypeByOrderNo(String orderNo) throws Exception;
 
     void uploadLogisticsOrderNo(List<OrderModel> orderModels) throws Exception;
+
+    PageInfo<OrderItemDTO> getOrderItemList(String orderNo, String orderItemNo, Integer timeWay, Integer orderUser, Integer orderItemType, String beginCreationTime, String endCreationTime, Integer shippWay, Integer payWay, Integer page, Integer size);
 }

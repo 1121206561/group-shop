@@ -1,6 +1,7 @@
 package cn.youxu.shop.service.impl;
 
 import cn.youxu.shop.entity.OrderDTO;
+import cn.youxu.shop.entity.OrderItemDTO;
 import cn.youxu.shop.entity.OrderModel;
 import cn.youxu.shop.exception.ServiceException;
 import cn.youxu.shop.mapper.OrderMapper;
@@ -47,7 +48,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void uploadLogisticsOrderNo(List<OrderModel> orderModels) throws Exception {
-        if (orderModels == null || orderModels.size() == 0){
+        if (orderModels == null || orderModels.size() == 0) {
             throw new ServiceException("请输入数据");
         }
         List<OrderDTO> orderDTOS = orderMapper.selectByOrderNo(orderModels);
@@ -60,5 +61,12 @@ public class OrderServiceImpl implements OrderService {
             throw new ServiceException(orderModels1.stream().map(OrderModel::getOrderNo).collect(Collectors.toList()).toString() + "不存在");
         }
         orderMapper.updateLogisticsOrderNo(orderModels);
+    }
+
+    @Override
+    public PageInfo<OrderItemDTO> getOrderItemList(String orderNo, String orderItemNo, Integer timeWay, Integer orderUser, Integer orderItemType, String beginCreationTime, String endCreationTime, Integer shippWay, Integer payWay, Integer page, Integer size) {
+        PageHelper.startPage(page, size);
+        return new PageInfo<>(orderMapper.getOrderItemList(orderNo, orderItemNo, timeWay, orderUser, orderItemType, beginCreationTime, endCreationTime, shippWay, payWay));
+
     }
 }
