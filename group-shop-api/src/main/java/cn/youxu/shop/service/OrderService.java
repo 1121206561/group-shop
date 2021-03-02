@@ -19,4 +19,6 @@ public interface OrderService {
     void updateAssessTypeById(OrderAssessDTO orderAssessDTO);
 
     PageInfo<OrderDeliveryDTO> getOrderDeliveryList(String orderItemNo, Integer page, Integer size);
+
+    OrderRecordDTO getOrderRecordList();
 }

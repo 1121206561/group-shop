@@ -126,4 +126,14 @@ public class OrderController {
             return CommonResponse.error();
         }
     }
+
+    @GetMapping("/getOrderRecordList")
+    @ApiOperation("统计数据")
+    public CommonResponse getOrderRecordList() {
+        try {
+            return CommonResponse.ok().data("content", orderService.getOrderRecordList());
+        } catch (Exception e) {
+            return CommonResponse.error();
+        }
+    }
 }

@@ -250,4 +250,14 @@
              AND gd.is_deleted = 0
          </where>
     </select>
+
+    <select id="getOrderListByDay" resultMap="OrderDTO">
+        SELECT DATE_FORMAT(go.creation_time,"%Y-%m-%d") as creation_time,
+        SUM(go.order_user_count) as order_user_count ,SUM(go.order_money) as order_money,
+        SUM(go.order_count) as order_count
+        FROM group_order go
+        WHERE go.is_deleted = 0
+        GROUP BY DATE_FORMAT(go.creation_time,"%Y-%m-%d")
+        order by creation_time desc
+    </select>
 </mapper>

@@ -33,4 +33,6 @@ public interface OrderMapper {
     void updateAssessTypeById(@Param("orderAssessDTO") OrderAssessDTO orderAssessDTO);
 
     List<OrderDeliveryDTO> getOrderDeliveryList(@Param("orderItemNo") String orderItemNo);
+
+    List<OrderDTO> getOrderListByDay();
 }

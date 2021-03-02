@@ -9,6 +9,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -82,5 +83,21 @@ public class OrderServiceImpl implements OrderService {
     public PageInfo<OrderDeliveryDTO> getOrderDeliveryList(String orderItemNo, Integer page, Integer size) {
         PageHelper.startPage(page, size);
         return new PageInfo<>(orderMapper.getOrderDeliveryList(orderItemNo));
+    }
+
+    @Override
+    public OrderRecordDTO getOrderRecordList() {
+        List<OrderDTO> orderList = orderMapper.getOrderListByDay();
+        OrderRecordDTO orderRecordDTO = new OrderRecordDTO();
+        orderList.stream().forEach(order -> {
+            orderRecordDTO.setOrderAmount(orderRecordDTO.getOrderAmount().add(order.getOrderMoney()));
+            orderRecordDTO.setOrderBackUser(0);
+            orderRecordDTO.setOrderCancel(0);
+            orderRecordDTO.setOrderCount(orderRecordDTO.getOrderCount() + order.getOrderCount());
+            orderRecordDTO.setOrderUser(orderRecordDTO.getOrderUser() + order.getOrderUserCount());
+            orderRecordDTO.setPayAmount(orderRecordDTO.getOrderAmount().add(order.getOrderMoney()));
+        });
+        orderRecordDTO.setOrderDTOS(orderList);
+        return orderRecordDTO;
     }
 }
