@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/group-shop.iml" filepath="$PROJECT_DIR$/group-shop.iml" />
       <module fileurl="file://$PROJECT_DIR$/group-shop-api/groupshopapi.iml" filepath="$PROJECT_DIR$/group-shop-api/groupshopapi.iml" />
       <module fileurl="file://$PROJECT_DIR$/gruop-shop-service/gruopshopservice.iml" filepath="$PROJECT_DIR$/gruop-shop-service/gruopshopservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wepy_shop_service/wepy_shop_service.iml" filepath="$PROJECT_DIR$/wepy_shop_service/wepy_shop_service.iml" />
     </modules>
   </component>
 </project>

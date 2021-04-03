@@ -6,6 +6,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="wepy_shop_service" />
         <module name="groupshopapi" />
         <module name="gruopshopservice" />
       </profile>
@@ -14,6 +15,7 @@
       <module name="group-shop" target="1.8" />
       <module name="groupshopapi" target="1.8" />
       <module name="gruopshopservice" target="1.8" />
+      <module name="wepy_shop_service" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -21,6 +23,7 @@
       <module name="group-shop" options="-parameters" />
       <module name="groupshopapi" options="-parameters" />
       <module name="gruopshopservice" options="-parameters" />
+      <module name="wepy_shop_service" options="-parameters" />
     </option>
   </component>
 </project>
